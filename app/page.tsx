@@ -264,7 +264,9 @@ export default function Home() {
               <span className="euro">€</span>
             </div>
             <div className="sub">
-              soit <strong>{pct}%</strong> de reduction vs l&apos;alternative
+              {"soit "}
+              <strong>{pct}%</strong>
+              {" de reduction vs l’alternative"}
             </div>
           </div>
 
