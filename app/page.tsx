@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Image from "next/image";
 
 type AltKey = "engineer" | "freelance" | "custom" | "saas";
 
 type Alt = {
   name: string;
   cost: (m: number, d: number, t: number) => number;
-  bar: "red" | "orange" | "blue" | "purple";
 };
 
 const presets = [
@@ -17,14 +17,33 @@ const presets = [
 ];
 
 const alts: Record<AltKey, Alt> = {
-  engineer: { name: "ML Engineer", cost: () => 78000, bar: "red" },
-  freelance: { name: "Freelance ML", cost: (m, d, t) => m * d * t, bar: "orange" },
-  custom: { name: "Pipeline maison", cost: (m, _d, t) => 60 * t + m * 5 * t, bar: "blue" },
-  saas: { name: "SaaS enterprise", cost: () => 36000, bar: "purple" },
+  engineer: { name: "ML Engineer", cost: () => 78000 },
+  freelance: { name: "Freelance ML", cost: (m, d, t) => m * d * t },
+  custom: { name: "Pipeline maison", cost: (m, _d, t) => 60 * t + m * 5 * t },
+  saas: { name: "SaaS enterprise", cost: () => 36000 },
 };
 
 function fmt(n: number) {
   return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
+function ArrowRight({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  );
 }
 
 export default function Home() {
@@ -65,21 +84,39 @@ export default function Home() {
 
   return (
     <>
-      <div className="header">
-        <div className="logo">
-          m<span className="ai">AI</span>ker
-        </div>
-        <h1>Calculez votre retour sur investissement.</h1>
-        <p>Comparez le cout de mAIker avec les alternatives et visualisez vos economies.</p>
-      </div>
+      <nav className="nav">
+        <a href="https://www.cania.fr/products/maiker" className="nav-logo" target="_blank" rel="noopener noreferrer">
+          <Image src="/maiker-logo.svg" alt="mAIker" width={120} height={32} priority />
+        </a>
+        <a href="https://www.cania.fr/products/maiker" className="nav-link" target="_blank" rel="noopener noreferrer">
+          <span>Decouvrir</span>
+          <span className="nav-link-arrow">
+            <ArrowRight size={14} />
+          </span>
+        </a>
+      </nav>
 
-      <div className="container">
+      <header className="hero">
+        <div className="badge">
+          <span className="badge-dot" />
+          <span>Powered by canIA</span>
+        </div>
+        <h1>
+          Calculez votre ROI.
+          <br />
+          <span className="muted">En quelques secondes.</span>
+        </h1>
+        <p>Comparez le cout de mAIker avec les alternatives ML et visualisez vos economies annuelles.</p>
+      </header>
+
+      <main className="container">
         {/* LEFT PANEL */}
         <div className="card">
           <div className="card-label">Votre situation</div>
 
           <div className="segments">
             <button
+              type="button"
               className={"seg-btn" + (seg === 0 ? " active" : "")}
               onClick={() => setSegment(0)}
             >
@@ -88,6 +125,7 @@ export default function Home() {
               PME
             </button>
             <button
+              type="button"
               className={"seg-btn" + (seg === 1 ? " active" : "")}
               onClick={() => setSegment(1)}
             >
@@ -96,6 +134,7 @@ export default function Home() {
               Startup
             </button>
             <button
+              type="button"
               className={"seg-btn" + (seg === 2 ? " active" : "")}
               onClick={() => setSegment(2)}
             >
@@ -109,7 +148,8 @@ export default function Home() {
             <div className="field-label">
               <span>Modeles ML par an</span>
               <div className="field-value">
-                {models} <span className="unit">modeles</span>
+                {models}
+                <span className="unit">modeles</span>
               </div>
             </div>
             <input
@@ -118,6 +158,7 @@ export default function Home() {
               max={20}
               value={models}
               onChange={(e) => setModels(+e.target.value)}
+              aria-label="Modeles ML par an"
             />
             <div className="range-labels">
               <span>1</span>
@@ -130,7 +171,8 @@ export default function Home() {
             <div className="field-label">
               <span>Jours par modele (aujourd&apos;hui)</span>
               <div className="field-value">
-                {days} <span className="unit">jours</span>
+                {days}
+                <span className="unit">jours</span>
               </div>
             </div>
             <input
@@ -139,6 +181,7 @@ export default function Home() {
               max={60}
               value={days}
               onChange={(e) => setDays(+e.target.value)}
+              aria-label="Jours par modele"
             />
             <div className="range-labels">
               <span>3j</span>
@@ -151,7 +194,8 @@ export default function Home() {
             <div className="field-label">
               <span>Cout journalier data / ML</span>
               <div className="field-value">
-                {fmt(tjm)} <span className="unit">euros/j</span>
+                {fmt(tjm)}
+                <span className="unit">€/j</span>
               </div>
             </div>
             <input
@@ -161,6 +205,7 @@ export default function Home() {
               step={50}
               value={tjm}
               onChange={(e) => setTjm(+e.target.value)}
+              aria-label="Cout journalier"
             />
             <div className="range-labels">
               <span>200</span>
@@ -173,7 +218,11 @@ export default function Home() {
             <div className="field-label">
               <span>Alternative comparee</span>
             </div>
-            <select value={alt} onChange={(e) => setAlt(e.target.value as AltKey)}>
+            <select
+              value={alt}
+              onChange={(e) => setAlt(e.target.value as AltKey)}
+              aria-label="Alternative comparee"
+            >
               <option value="engineer">Recruter un ML Engineer</option>
               <option value="freelance">Freelance / prestataire</option>
               <option value="custom">Pipeline MLOps maison</option>
@@ -181,11 +230,12 @@ export default function Home() {
             </select>
           </div>
 
-          <div className="field">
+          <div className="field" style={{ marginBottom: 0 }}>
             <div className="field-label">
               <span>Serveur mAIker</span>
               <div className="field-value">
-                {fmt(server)} <span className="unit">euros/mois</span>
+                {fmt(server)}
+                <span className="unit">€/mois</span>
               </div>
             </div>
             <input
@@ -195,6 +245,7 @@ export default function Home() {
               step={10}
               value={server}
               onChange={(e) => setServer(+e.target.value)}
+              aria-label="Serveur mAIker"
             />
             <div className="range-labels">
               <span>34</span>
@@ -208,21 +259,26 @@ export default function Home() {
         <div className="results">
           <div className="hero-metric">
             <div className="label">Economie annuelle</div>
-            <div className="amount">{fmt(saved)} euros</div>
-            <div className="sub">soit {pct}% de reduction vs l&apos;alternative</div>
+            <div className="amount">
+              {fmt(saved)}
+              <span className="euro">€</span>
+            </div>
+            <div className="sub">
+              soit <strong>{pct}%</strong> de reduction vs l&apos;alternative
+            </div>
           </div>
 
           <div className="metric-row">
             <div className="metric">
-              <div className="val blue">{roiText}</div>
+              <div className="val">{roiText}</div>
               <div className="lbl">ROI</div>
             </div>
             <div className="metric">
-              <div className="val cyan">{daysSaved}j</div>
-              <div className="lbl">Jours gagnes / an</div>
+              <div className="val">{daysSaved}j</div>
+              <div className="lbl">Jours gagnes</div>
             </div>
             <div className="metric">
-              <div className="val green">{paybackText}</div>
+              <div className="val">{paybackText}</div>
               <div className="lbl">Rentabilisation</div>
             </div>
           </div>
@@ -233,18 +289,15 @@ export default function Home() {
               <div className="bar-row">
                 <div className="bar-name">mAIker</div>
                 <div className="bar-track">
-                  <div className="bar-fill green" style={{ width: maikerBarWidth + "%" }} />
-                  <div className="bar-cost">{fmt(maiker)} euros/an</div>
+                  <div className="bar-fill maiker" style={{ width: maikerBarWidth + "%" }} />
+                  <div className="bar-cost">{fmt(maiker)} €/an</div>
                 </div>
               </div>
               <div className="bar-row">
                 <div className="bar-name">{a.name}</div>
                 <div className="bar-track">
-                  <div
-                    className={"bar-fill " + a.bar}
-                    style={{ width: altBarWidth + "%" }}
-                  />
-                  <div className="bar-cost">{fmt(altCost)} euros/an</div>
+                  <div className="bar-fill alt" style={{ width: altBarWidth + "%" }} />
+                  <div className="bar-cost">{fmt(altCost)} €/an</div>
                 </div>
               </div>
             </div>
@@ -255,27 +308,27 @@ export default function Home() {
             <div>
               <div className="detail-row">
                 <div className="dt">Licence mAIker</div>
-                <div className="dd">200 euros/mois</div>
+                <div className="dd muted">200 €/mois</div>
               </div>
               <div className="detail-row">
                 <div className="dt">Serveur</div>
-                <div className="dd">{fmt(server)} euros/mois</div>
+                <div className="dd muted">{fmt(server)} €/mois</div>
               </div>
               <div className="detail-row">
                 <div className="dt">Cout total mAIker</div>
-                <div className="dd green">{fmt(maiker)} euros/an</div>
+                <div className="dd green">{fmt(maiker)} €/an</div>
               </div>
               <div className="detail-row">
                 <div className="dt">Cout {a.name.toLowerCase()}</div>
-                <div className="dd red">{fmt(altCost)} euros/an</div>
+                <div className="dd">{fmt(altCost)} €/an</div>
               </div>
               <div className="detail-row">
                 <div className="dt">Temps mAIker par modele</div>
-                <div className="dd">~3 jours</div>
+                <div className="dd muted">~3 jours</div>
               </div>
               <div className="detail-row">
                 <div className="dt">Temps actuel par modele</div>
-                <div className="dd">{days} jours</div>
+                <div className="dd muted">{days} jours</div>
               </div>
               <div className="detail-row">
                 <div className="dt">Jours liberes par an</div>
@@ -291,13 +344,16 @@ export default function Home() {
               rel="noopener noreferrer"
               className="cta"
             >
-              Decouvrir mAIker
+              <span>Decouvrir mAIker</span>
+              <span className="cta-arrow">
+                <ArrowRight size={14} />
+              </span>
             </a>
           </div>
         </div>
-      </div>
+      </main>
 
-      <div className="footer">
+      <footer className="footer">
         Simulateur construit par{" "}
         <a href="https://acceleria.co" target="_blank" rel="noopener noreferrer">
           AcceleriA
@@ -305,10 +361,9 @@ export default function Home() {
         pour{" "}
         <a href="https://www.cania.fr" target="_blank" rel="noopener noreferrer">
           canIA
-        </a>
-        <br />
-        Les estimations sont indicatives.
-      </div>
+        </a>{" "}
+        — Estimations indicatives.
+      </footer>
     </>
   );
 }
